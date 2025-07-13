@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page">
+    <div class="page-header">
+        <h1 class="page-title">{{ title }}</h1>
+        {% if description %}
+        <p class="page-description">{{ description }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="page-content">
+        {{ content | safe }}
+    </div>
+</div>
+{% endblock %}

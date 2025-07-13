@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if page.title != site.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <meta name="description" content="{{ page.description or site.description }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ '/assets/favicon.ico' | url_for(site.base) }}">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | url_for(site.base) }}">
+    <link rel="stylesheet" href="{{ '/assets/css/highlight.css' | url_for(site.base) }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site.base }}{{ page.url }}">
+    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:description" content="{{ page.description or site.description }}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ site.base }}{{ page.url }}">
+    <meta property="twitter:title" content="{{ page.title }}">
+    <meta property="twitter:description" content="{{ page.description or site.description }}">
+</head>
+<body>
+    <div class="layout">
+        <!-- Navigation -->
+        {% include "nav.html" %}
+        
+        <!-- Sidebar -->
+        {% if theme.sidebar %}
+        <aside class="sidebar">
+            {% include "sidebar.html" %}
+        </aside>
+        {% endif %}
+        
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-container">
+                {% block content %}{% endblock %}
+                
+                <!-- Edit Link -->
+                {% if theme.editLink and theme.editLink.pattern %}
+                <div class="edit-link">
+                    <a href="{{ theme.editLink.pattern.replace(':path', page.frontmatter.get('editPath', page.url.strip('/') + '.md')) }}" target="_blank" rel="noopener">
+                        {{ theme.editLink.text }}
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Last Updated -->
+                {% if theme.lastUpdated and lastModified %}
+                <div class="last-updated">
+                    Last updated: {{ lastModified | format_date("%B %d, %Y") }}
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Footer -->
+    {% if theme.footer and (theme.footer.message or theme.footer.copyright) %}
+    <footer class="footer">
+        <div class="footer-container">
+            {% if theme.footer.message %}
+            <p class="footer-message">{{ theme.footer.message }}</p>
+            {% endif %}
+            {% if theme.footer.copyright %}
+            <p class="footer-copyright">{{ theme.footer.copyright }}</p>
+            {% endif %}
+        </div>
+    </footer>
+    {% endif %}
+    
+    <!-- Scripts -->
+    <script src="{{ '/assets/js/main.js' | url_for(site.base) }}"></script>
+    <script src="{{ '/assets/js/search.js' | url_for(site.base) }}"></script>
+</body>
+</html>
