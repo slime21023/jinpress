@@ -12,15 +12,30 @@ import click
 
 from .builder import Builder, BuildError
 from .config import Config, ConfigError
+from .logging_config import setup_logging
 from .scaffold import Scaffold, ScaffoldError
 from .server import serve_site
 
 
 @click.group()
 @click.version_option(version="1.0.0", prog_name="jinpress")
-def cli():
+@click.option(
+    "--verbose", "-v",
+    is_flag=True,
+    help="Enable verbose logging"
+)
+@click.pass_context
+def cli(ctx, verbose):
     """JinPress - A fast, lightweight Python static site generator."""
-    pass
+    # Ensure context object exists
+    ctx.ensure_object(dict)
+    
+    # Set up logging
+    log_level = "DEBUG" if verbose else "INFO"
+    setup_logging(level=log_level)
+    
+    # Store verbose flag in context
+    ctx.obj['verbose'] = verbose
 
 
 @cli.command()

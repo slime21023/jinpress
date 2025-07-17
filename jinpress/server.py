@@ -5,6 +5,7 @@ Provides live reload functionality during development.
 """
 
 import http.server
+import logging
 import socketserver
 import threading
 import time
@@ -15,6 +16,8 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from .builder import Builder
+
+logger = logging.getLogger(__name__)
 
 
 class LiveReloadHandler(FileSystemEventHandler):
@@ -44,7 +47,7 @@ class LiveReloadHandler(FileSystemEventHandler):
         if not self._should_rebuild(file_path):
             return
         
-        print(f"File changed: {file_path}")
+        logger.info(f"File changed: {file_path}")
         self._schedule_rebuild()
     
     def on_created(self, event):
@@ -58,7 +61,7 @@ class LiveReloadHandler(FileSystemEventHandler):
         
         file_path = Path(event.src_path)
         if self._should_rebuild(file_path):
-            print(f"File deleted: {file_path}")
+            logger.info(f"File deleted: {file_path}")
             self._schedule_rebuild()
     
     def _should_rebuild(self, file_path: Path) -> bool:
@@ -90,13 +93,13 @@ class LiveReloadHandler(FileSystemEventHandler):
     def _rebuild(self):
         """Perform the actual rebuild."""
         try:
-            print("Rebuilding site...")
+            logger.info("Rebuilding site...")
             start_time = time.time()
             self.builder.build(clean=False)  # Don't clean to speed up rebuilds
             elapsed = time.time() - start_time
-            print(f"Site rebuilt in {elapsed:.2f}s")
+            logger.info(f"Site rebuilt in {elapsed:.2f}s")
         except Exception as e:
-            print(f"Build error: {e}")
+            logger.error(f"Build error: {e}")
 
 
 class DevServer:
@@ -120,7 +123,7 @@ class DevServer:
     def start(self) -> None:
         """Start the development server."""
         # Initial build
-        print("Building site...")
+        logger.info("Building site...")
         self.builder.build()
         
         # Start file watcher
@@ -161,7 +164,7 @@ class DevServer:
                 self.observer.schedule(event_handler, str(watch_dir), recursive=True)
         
         self.observer.start()
-        print("File watcher started")
+        logger.debug("File watcher started")
     
     def _start_http_server(self) -> None:
         """Start the HTTP server."""
@@ -190,21 +193,21 @@ class DevServer:
         try:
             with socketserver.TCPServer((self.host, self.port), CustomHandler) as httpd:
                 self.server = httpd
-                print(f"Development server running at http://{self.host}:{self.port}")
-                print("Press Ctrl+C to stop")
+                logger.info(f"Development server running at http://{self.host}:{self.port}")
+                logger.info("Press Ctrl+C to stop")
                 
                 try:
                     httpd.serve_forever()
                 except KeyboardInterrupt:
-                    print("\nShutting down server...")
+                    logger.info("\nShutting down server...")
                     self.stop()
         
         except OSError as e:
             if e.errno == 48:  # Address already in use
-                print(f"Error: Port {self.port} is already in use")
-                print(f"Try using a different port: jinpress serve --port {self.port + 1}")
+                logger.error(f"Error: Port {self.port} is already in use")
+                logger.error(f"Try using a different port: jinpress serve --port {self.port + 1}")
             else:
-                print(f"Error starting server: {e}")
+                logger.error(f"Error starting server: {e}")
             raise
 
 
@@ -222,7 +225,7 @@ def serve_site(project_root: Path, host: str = "localhost", port: int = 8000) ->
         server = DevServer(builder, host, port)
         server.start()
     except KeyboardInterrupt:
-        print("\nServer stopped")
+        logger.info("\nServer stopped")
     except Exception as e:
-        print(f"Server error: {e}")
+        logger.error(f"Server error: {e}")
         raise

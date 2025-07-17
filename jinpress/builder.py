@@ -4,6 +4,7 @@ Site builder for JinPress.
 Orchestrates the build process for static site generation.
 """
 
+import logging
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -12,6 +13,8 @@ from .config import Config
 from .renderer import Renderer
 from .search import SearchIndexer
 from .theme.engine import ThemeEngine
+
+logger = logging.getLogger(__name__)
 
 
 class BuildError(Exception):
@@ -49,32 +52,39 @@ class Builder:
         Args:
             clean: Whether to clean output directory before building
         """
-        print("Building JinPress site...")
+        logger.info("Building JinPress site...")
         
-        # Clean output directory if requested
-        if clean:
-            self._clean_output_dir()
-        
-        # Create output directory
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Process markdown files
-        processed_files = self._process_markdown_files()
-        print(f"Processed {len(processed_files)} pages")
-        
-        # Generate pages
-        self._generate_pages(processed_files)
-        
-        # Copy static files
-        self._copy_static_files()
-        
-        # Copy theme assets
-        self._copy_theme_assets()
-        
-        # Generate search index
-        self._generate_search_index()
-        
-        print(f"Site built successfully in {self.output_dir}")
+        try:
+            # Clean output directory if requested
+            if clean:
+                logger.debug("Cleaning output directory")
+                self._clean_output_dir()
+            
+            # Create output directory
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            logger.debug(f"Created output directory: {self.output_dir}")
+            
+            # Process markdown files
+            processed_files = self._process_markdown_files()
+            logger.info(f"Processed {len(processed_files)} pages")
+            
+            # Generate pages
+            self._generate_pages(processed_files)
+            
+            # Copy static files
+            self._copy_static_files()
+            
+            # Copy theme assets
+            self._copy_theme_assets()
+            
+            # Generate search index
+            self._generate_search_index()
+            
+            logger.info(f"Site built successfully in {self.output_dir}")
+            
+        except Exception as e:
+            logger.error(f"Build failed: {e}")
+            raise BuildError(f"Build failed: {e}") from e
     
     def _clean_output_dir(self) -> None:
         """Clean the output directory."""
@@ -103,7 +113,7 @@ class Builder:
                 self.search_indexer.add_document(file_info)
                 
             except Exception as e:
-                print(f"Warning: Failed to process {md_file}: {e}")
+                logger.warning(f"Failed to process {md_file}: {e}")
         
         return processed_files
     
@@ -118,7 +128,7 @@ class Builder:
             try:
                 self._generate_page(file_info)
             except Exception as e:
-                print(f"Warning: Failed to generate page for {file_info['file_path']}: {e}")
+                logger.warning(f"Failed to generate page for {file_info['file_path']}: {e}")
     
     def _generate_page(self, file_info: Dict[str, Any]) -> None:
         """
@@ -173,26 +183,26 @@ class Builder:
         
         try:
             shutil.copytree(self.static_dir, dest_dir, dirs_exist_ok=True)
-            print(f"Copied static files from {self.static_dir}")
+            logger.debug(f"Copied static files from {self.static_dir}")
         except Exception as e:
-            print(f"Warning: Failed to copy static files: {e}")
+            logger.warning(f"Failed to copy static files: {e}")
     
     def _copy_theme_assets(self) -> None:
         """Copy theme assets to output directory."""
         try:
             self.theme_engine.copy_static_files(self.output_dir)
-            print("Copied theme assets")
+            logger.debug("Copied theme assets")
         except Exception as e:
-            print(f"Warning: Failed to copy theme assets: {e}")
+            logger.warning(f"Failed to copy theme assets: {e}")
     
     def _generate_search_index(self) -> None:
         """Generate search index file."""
         try:
             search_index_path = self.output_dir / "search-index.json"
             self.search_indexer.generate_index(search_index_path)
-            print(f"Generated search index with {self.search_indexer.get_document_count()} documents")
+            logger.debug(f"Generated search index with {self.search_indexer.get_document_count()} documents")
         except Exception as e:
-            print(f"Warning: Failed to generate search index: {e}")
+            logger.warning(f"Failed to generate search index: {e}")
     
     def get_build_info(self) -> Dict[str, Any]:
         """
