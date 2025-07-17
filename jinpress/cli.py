@@ -200,5 +200,10 @@ def info(config: Optional[Path]):
         sys.exit(1)
 
 
+def main():
+    """Main entry point for the jinpress CLI."""
+    cli()
+
+
 if __name__ == "__main__":
     cli()

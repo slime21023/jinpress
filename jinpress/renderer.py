@@ -29,9 +29,9 @@ class JinPressRenderer(RendererHTML):
     
     def __init__(self, base_path: str = "/"):
         super().__init__()
-        self.base_path = base_path.rstrip("/") + "/"
+        self.base_path = str(base_path).rstrip("/") + "/"
     
-    def fence(self, tokens, idx, options, env, renderer):
+    def fence(self, tokens, idx, options, env):
         """Render code blocks with syntax highlighting."""
         token = tokens[idx]
         info = token.info.strip() if token.info else ""
@@ -69,7 +69,8 @@ class JinPressRenderer(RendererHTML):
                 pass
         
         # Fallback for unknown languages
-        escaped_code = self.utils.escapeHtml(code)
+        import html
+        escaped_code = html.escape(code)
         return f'<pre><code class="language-{lang}">{escaped_code}</code></pre>'
 
 
@@ -96,8 +97,10 @@ class Renderer:
         
         # Add plugins
         md.use(front_matter_plugin)
+        
+        # Add container plugins
         md.use(container_plugin, name="tip")
-        md.use(container_plugin, name="warning")
+        md.use(container_plugin, name="warning") 
         md.use(container_plugin, name="danger")
         md.use(container_plugin, name="info")
         md.use(container_plugin, name="details")
@@ -108,30 +111,71 @@ class Renderer:
         # Add link transformation rule
         md.add_render_rule("link_open", self._render_link_open)
         
+        # Add container render rules
+        md.add_render_rule("container_tip_open", self._render_container_open)
+        md.add_render_rule("container_tip_close", self._render_container_close)
+        md.add_render_rule("container_warning_open", self._render_container_open)
+        md.add_render_rule("container_warning_close", self._render_container_close)
+        md.add_render_rule("container_danger_open", self._render_container_open)
+        md.add_render_rule("container_danger_close", self._render_container_close)
+        md.add_render_rule("container_info_open", self._render_container_open)
+        md.add_render_rule("container_info_close", self._render_container_close)
+        md.add_render_rule("container_details_open", self._render_container_open)
+        md.add_render_rule("container_details_close", self._render_container_close)
+        
         return md
     
-    def _render_link_open(self, tokens, idx, options, env, renderer):
+    def _render_link_open(self, tokens, idx, options, env):
         """Custom link renderer to handle .md file links."""
         token = tokens[idx]
-        href_idx = token.attrIndex("href")
         
-        if href_idx >= 0:
-            href = token.attrs[href_idx][1]
-            
+        # Get href attribute
+        href = token.attrs.get("href")
+        if href:
             # Transform .md links to pretty URLs
             if href.endswith(".md"):
                 # Remove .md extension and ensure trailing slash
                 new_href = href[:-3]
                 if not new_href.endswith("/"):
                     new_href += "/"
-                token.attrs[href_idx][1] = new_href
+                token.attrs["href"] = new_href
             
-            # Handle relative links
+            # Handle relative links (keep as is for now)
             elif href.startswith("./") or href.startswith("../"):
-                # Resolve relative paths
-                token.attrs[href_idx][1] = href
+                # Keep relative paths as they are
+                pass
         
-        return renderer.renderToken(tokens, idx, options)
+        # Render the link opening tag
+        attrs = []
+        for key, value in token.attrs.items():
+            attrs.append(f'{key}="{value}"')
+        
+        attrs_str = " " + " ".join(attrs) if attrs else ""
+        return f"<a{attrs_str}>"
+    
+    def _render_container_open(self, tokens, idx, options, env):
+        """Custom container opening renderer."""
+        token = tokens[idx]
+        info = token.info.strip() if token.info else ""
+        container_type = info.split()[0] if info else "container"
+        return f'<div class="container-{container_type}">\n'
+    
+    def _render_container_close(self, tokens, idx, options, env):
+        """Custom container closing renderer."""
+        return '</div>\n'
+    
+    def _render_container(self, tokens, idx, options, env):
+        """Custom container renderer for tip, warning, danger, info containers."""
+        token = tokens[idx]
+        info = token.info.strip() if token.info else ""
+        
+        if token.nesting == 1:
+            # Opening tag
+            container_type = info.split()[0] if info else "container"
+            return f'<div class="container-{container_type}">\n'
+        else:
+            # Closing tag
+            return '</div>\n'
     
     def extract_front_matter(self, content: str) -> Tuple[Dict[str, Any], str]:
         """
@@ -159,20 +203,32 @@ class Renderer:
         
         return front_matter, content
     
-    def render_markdown(self, content: str) -> str:
+    def render_markdown(self, file_path: Path) -> Tuple[str, Dict[str, Any]]:
         """
-        Render markdown content to HTML.
+        Render markdown file to HTML with metadata extraction.
         
         Args:
-            content: Markdown content
+            file_path: Path to markdown file
             
         Returns:
-            Rendered HTML
+            Tuple of (rendered_html, metadata_dict)
         """
+        if not file_path.exists():
+            raise RendererError(f"File not found: {file_path}")
+        
         try:
-            return self.md.render(content)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                raw_content = f.read()
         except Exception as e:
-            raise RendererError(f"Error rendering markdown: {e}")
+            raise RendererError(f"Error reading file {file_path}: {e}")
+        
+        # Extract front matter
+        front_matter, content = self.extract_front_matter(raw_content)
+        
+        # Render markdown to HTML
+        html = self.md.render(content)
+        
+        return html, front_matter
     
     def process_file(self, file_path: Path, docs_dir: Path) -> Dict[str, Any]:
         """
@@ -198,7 +254,7 @@ class Renderer:
         front_matter, content = self.extract_front_matter(raw_content)
         
         # Render markdown to HTML
-        html_content = self.render_markdown(content)
+        html_content = self.md.render(content)
         
         # Calculate relative path from docs directory
         relative_path = file_path.relative_to(docs_dir)

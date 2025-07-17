@@ -6,9 +6,10 @@ Handles template loading, rendering, and theme customization.
 
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Optional
 
-from minijinja import Environment, FileSystemLoader
+import minijinja
+from minijinja import Environment
 
 
 class ThemeError(Exception):
@@ -48,10 +49,16 @@ class ThemeEngine:
         
         if not template_paths:
             raise ThemeError("No template directories found")
-        
-        # Create environment with FileSystemLoader
-        loader = FileSystemLoader(template_paths)
-        env = Environment(loader=loader)
+
+        def custom_loader(name: str) -> Optional[str]:
+            for template_path in template_paths:
+                path = Path(template_path) / name
+                if path.is_file():
+                    with open(path, "r", encoding="utf-8") as f:
+                        return f.read()
+            return None
+
+        env = Environment(loader=custom_loader)
         
         # Add custom filters and functions
         self._add_custom_filters(env)
@@ -65,6 +72,10 @@ class ThemeEngine:
             """Generate URL for a given path."""
             if path.startswith("http"):
                 return path
+            
+            # Handle None base
+            if base is None:
+                base = "/"
             
             base = base.rstrip("/")
             path = path.lstrip("/")
@@ -103,9 +114,9 @@ class ThemeEngine:
             return dt.strftime(format_str)
         
         # Register filters
-        env.filters["url_for"] = url_for
-        env.filters["relative_url"] = relative_url
-        env.filters["format_date"] = format_date
+        env.add_filter("url_for", url_for)
+        env.add_filter("relative_url", relative_url)
+        env.add_filter("format_date", format_date)
     
     def render_page(self, template_name: str, context: Dict[str, Any]) -> str:
         """
@@ -119,8 +130,7 @@ class ThemeEngine:
             Rendered HTML content
         """
         try:
-            template = self.env.get_template(template_name)
-            return template.render(**context)
+            return self.env.render_template(template_name, **context)
         except Exception as e:
             raise ThemeError(f"Error rendering template '{template_name}': {e}")
     
@@ -201,7 +211,12 @@ class ThemeEngine:
             True if template exists, False otherwise
         """
         try:
-            self.env.get_template(template_name)
+            # Try to render the template with empty context to check if it exists
+            self.env.render_template(template_name, {})
             return True
         except:
+            # Check if template exists by trying to load it directly
+            for template_path in [self.project_root / "templates", Path(__file__).parent / "default" / "templates"]:
+                if template_path.exists() and (template_path / template_name).is_file():
+                    return True
             return False
