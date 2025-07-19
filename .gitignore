@@ -4,3 +4,4 @@ test-project
 **/__pycache__
 jinpress/theme/__pycache_
 dist
+.vscode

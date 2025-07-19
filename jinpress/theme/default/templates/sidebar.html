@@ -1,16 +1,16 @@
 <div class="sidebar-content">
     {% for path, items in theme.sidebar.items() %}
-    {% if page.url.startswith(path) %}
     <div class="sidebar-group">
+        <div class="sidebar-group-title">{{ path.strip('/').title() or 'Main' }}</div>
         {% for item in items %}
         <div class="sidebar-item">
-            {% if item.items %}
+            {% if item.get('items') %}
             <!-- Nested sidebar group -->
-            <div class="sidebar-group-title">{{ item.text }}</div>
+            <div class="sidebar-subgroup-title">{{ item.text }}</div>
             <div class="sidebar-subgroup">
                 {% for subitem in item.items %}
                 <a href="{{ subitem.link | url_for(site.base) }}" 
-                   class="sidebar-link{% if page.url == subitem.link %} active{% endif %}">
+                   class="sidebar-link{% if url == subitem.link %} active{% endif %}">
                     {{ subitem.text }}
                 </a>
                 {% endfor %}
@@ -18,13 +18,12 @@
             {% else %}
             <!-- Regular sidebar link -->
             <a href="{{ item.link | url_for(site.base) }}" 
-               class="sidebar-link{% if page.url == item.link %} active{% endif %}">
+               class="sidebar-link{% if url == item.link %} active{% endif %}">
                 {{ item.text }}
             </a>
             {% endif %}
         </div>
         {% endfor %}
     </div>
-    {% endif %}
     {% endfor %}
 </div>

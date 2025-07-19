@@ -214,13 +214,17 @@ class ThemeEngine:
         # Base context
         context = page_data.copy()
         
-        # Add theme-specific helpers
-        context.update({
-            "theme": {
+        # Preserve existing theme config and add theme-specific helpers
+        if "theme" in context:
+            context["theme"].update({
+                "name": self.theme_name,
+                "assets_base": "/assets/",
+            })
+        else:
+            context["theme"] = {
                 "name": self.theme_name,
                 "assets_base": "/assets/",
             }
-        })
         
         return context
     

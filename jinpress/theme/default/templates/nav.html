@@ -20,7 +20,7 @@
         <div class="navbar-nav">
             {% for item in theme.nav %}
             <div class="nav-item">
-                {% if item.items %}
+                {% if item.get('items') %}
                 <!-- Dropdown menu -->
                 <div class="nav-dropdown">
                     <button class="nav-link dropdown-toggle" type="button">

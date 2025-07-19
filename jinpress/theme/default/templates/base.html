@@ -45,7 +45,7 @@
                 <!-- Edit Link -->
                 {% if theme.editLink and theme.editLink.pattern %}
                 <div class="edit-link">
-                    <a href="{{ theme.editLink.pattern.replace(':path', page.frontmatter.get('editPath', page.url.strip('/') + '.md')) }}" target="_blank" rel="noopener">
+                    <a href="{{ theme.editLink.pattern.replace(':path', page.frontmatter.get('editPath', url.strip('/') + '.md')) }}" target="_blank" rel="noopener">
                         {{ theme.editLink.text }}
                     </a>
                 </div>

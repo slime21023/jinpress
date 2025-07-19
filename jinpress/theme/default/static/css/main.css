@@ -213,6 +213,19 @@ body {
     letter-spacing: 0.05em;
 }
 
+.sidebar-subgroup-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-md);
+    font-size: 0.8rem;
+}
+
+.sidebar-subgroup {
+    margin-left: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
 .sidebar-link {
     display: block;
     color: var(--color-text-light);
