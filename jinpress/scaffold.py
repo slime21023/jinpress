@@ -43,6 +43,11 @@ themeConfig:
         link: "/guide/configuration/"
       - text: "Deployment"
         link: "/guide/deployment/"
+    "/":
+      - text: "Home"
+        link: "/"
+      - text: "About"
+        link: "/about/"
   
   socialLinks:
     - icon: "github"
@@ -147,6 +152,38 @@ This is a tip container. You can use different types like `warning`, `danger`, a
 - Read the [Getting Started Guide](/guide/getting-started/)
 - Learn about [Configuration](/guide/configuration/)
 - Explore [Deployment Options](/guide/deployment/)
+''',
+            
+            'guide/index.md': '''---
+title: "Guide"
+description: "JinPress documentation guide"
+---
+
+# Guide
+
+Welcome to the JinPress guide! Here you'll find comprehensive documentation to help you get the most out of JinPress.
+
+## Getting Started
+
+New to JinPress? Start with our [Getting Started](/guide/getting-started/) guide to learn the basics.
+
+## Configuration
+
+Learn how to configure your JinPress site in the [Configuration](/guide/configuration/) section.
+
+## Deployment
+
+Ready to deploy your site? Check out our [Deployment](/guide/deployment/) guide for various hosting options.
+
+## Quick Navigation
+
+- [Getting Started](/guide/getting-started/) - Learn the basics
+- [Configuration](/guide/configuration/) - Customize your site
+- [Deployment](/guide/deployment/) - Deploy your site
+
+---
+
+Choose a topic from the sidebar to dive deeper into JinPress documentation.
 ''',
             
             'guide/getting-started.md': '''---
