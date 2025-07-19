@@ -5,7 +5,7 @@ Inspired by VitePress, JinPress provides a Python-native solution for building
 beautiful documentation sites with minimal configuration.
 """
 
-__version__ = "1.0.0"
+__version__ = "0.9.0"
 __author__ = "KevinChueh"
 __email__ = "slime21023@gmail.com"
 __license__ = "MIT"

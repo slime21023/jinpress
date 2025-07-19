@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jinpress"
-version = "1.0.0"
+version = "0.9.0"
 description = "A fast, lightweight, and elegantly configured Python static site generator inspired by VitePress"
 readme = "README.md"
 license = "MIT"
@@ -41,10 +41,7 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
+    "ruff>=0.1.0",
 ]
 
 [project.scripts]
@@ -59,16 +56,25 @@ Issues = "https://github.com/jinpress/jinpress/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["jinpress"]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ['py38']
+target-version = "py312"
 
-[tool.isort]
-profile = "black"
-line_length = 88
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = []
 
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint.isort]
+known-first-party = ["jinpress"]
