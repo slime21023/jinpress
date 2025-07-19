@@ -2,5 +2,5 @@ test-project
 .venv
 **/.pytest_cache
 **/__pycache__
-jinpress/theme/__pycache__
+jinpress/theme/__pycache_
 dist
