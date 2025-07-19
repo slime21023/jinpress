@@ -10,6 +10,7 @@ from typing import Optional
 
 import click
 
+from . import __version__
 from .builder import Builder, BuildError
 from .config import Config, ConfigError
 from .logging_config import setup_logging
@@ -18,7 +19,7 @@ from .server import serve_site
 
 
 @click.group()
-@click.version_option(version="1.0.0", prog_name="jinpress")
+@click.version_option(version=__version__, prog_name="jinpress")
 @click.option(
     "--verbose", "-v",
     is_flag=True,

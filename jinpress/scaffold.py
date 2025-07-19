@@ -5,7 +5,7 @@ Creates new JinPress projects with sample content and configuration.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 
 class ScaffoldError(Exception):
@@ -13,66 +13,15 @@ class ScaffoldError(Exception):
     pass
 
 
-class Scaffold:
-    """Project scaffolding for JinPress."""
+class ScaffoldTemplates:
+    """Static templates and content for scaffolding."""
     
-    def __init__(self):
-        """Initialize scaffolder."""
-        pass
-    
-    def create_project(self, project_name: str, target_dir: Optional[Path] = None) -> Path:
-        """
-        Create a new JinPress project.
-        
-        Args:
-            project_name: Name of the project
-            target_dir: Target directory (defaults to current directory)
-            
-        Returns:
-            Path to the created project directory
-        """
-        if target_dir is None:
-            target_dir = Path.cwd()
-        
-        project_dir = target_dir / project_name
-        
-        # Check if directory already exists
-        if project_dir.exists():
-            raise ScaffoldError(f"Directory already exists: {project_dir}")
-        
-        # Create project structure
-        self._create_directory_structure(project_dir)
-        
-        # Create configuration file
-        self._create_config_file(project_dir, project_name)
-        
-        # Create sample content
-        self._create_sample_content(project_dir)
-        
-        # Create gitignore
-        self._create_gitignore(project_dir)
-        
-        return project_dir
-    
-    def _create_directory_structure(self, project_dir: Path) -> None:
-        """Create the basic directory structure."""
-        directories = [
-            project_dir,
-            project_dir / "docs",
-            project_dir / "docs" / "guide",
-            project_dir / "static",
-            project_dir / "templates",
-            project_dir / ".jinpress",
-            project_dir / ".jinpress" / "cache",
-        ]
-        
-        for directory in directories:
-            directory.mkdir(parents=True, exist_ok=True)
-    
-    def _create_config_file(self, project_dir: Path, project_name: str) -> None:
-        """Create the configuration file."""
-        config_content = f"""site:
-  title: "{project_name.replace('-', ' ').replace('_', ' ').title()}"
+    @staticmethod
+    def get_config_template(project_name: str) -> str:
+        """Get configuration file template."""
+        title = project_name.replace('-', ' ').replace('_', ' ').title()
+        return f'''site:
+  title: "{title}"
   description: "A JinPress documentation site"
   lang: "en-US"
   base: "/"
@@ -108,17 +57,57 @@ themeConfig:
     copyright: "Copyright © 2025"
   
   lastUpdated: true
-"""
-        
-        config_path = project_dir / "config.yml"
-        with open(config_path, 'w', encoding='utf-8') as f:
-            f.write(config_content)
-    
-    def _create_sample_content(self, project_dir: Path) -> None:
-        """Create sample markdown content."""
-        
-        # Create index.md
-        index_content = f"""---
+'''
+
+    @staticmethod
+    def get_gitignore_template() -> str:
+        """Get .gitignore file template."""
+        return '''# JinPress
+dist/
+.jinpress/cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+'''
+
+    @staticmethod
+    def get_content_templates() -> Dict[str, str]:
+        """Get all markdown content templates."""
+        return {
+            'index.md': '''---
 title: "Welcome to JinPress"
 description: "A fast, lightweight, and elegantly configured Python static site generator"
 ---
@@ -158,14 +147,9 @@ This is a tip container. You can use different types like `warning`, `danger`, a
 - Read the [Getting Started Guide](/guide/getting-started/)
 - Learn about [Configuration](/guide/configuration/)
 - Explore [Deployment Options](/guide/deployment/)
-"""
-        
-        index_path = project_dir / "docs" / "index.md"
-        with open(index_path, 'w', encoding='utf-8') as f:
-            f.write(index_content)
-        
-        # Create getting-started.md
-        getting_started_content = """---
+''',
+            
+            'guide/getting-started.md': '''---
 title: "Getting Started"
 description: "Learn how to get started with JinPress"
 ---
@@ -231,14 +215,9 @@ The built site will be in the `dist/` directory.
 
 - Learn about [Configuration](/guide/configuration/)
 - Explore [Deployment Options](/guide/deployment/)
-"""
-        
-        getting_started_path = project_dir / "docs" / "guide" / "getting-started.md"
-        with open(getting_started_path, 'w', encoding='utf-8') as f:
-            f.write(getting_started_content)
-        
-        # Create configuration.md
-        config_content = """---
+''',
+            
+            'guide/configuration.md': '''---
 title: "Configuration"
 description: "Learn how to configure your JinPress site"
 ---
@@ -312,14 +291,9 @@ themeConfig:
     message: "Built with JinPress"
     copyright: "Copyright © 2025"
 ```
-"""
-        
-        config_path = project_dir / "docs" / "guide" / "configuration.md"
-        with open(config_path, 'w', encoding='utf-8') as f:
-            f.write(config_content)
-        
-        # Create deployment.md
-        deployment_content = """---
+''',
+            
+            'guide/deployment.md': '''---
 title: "Deployment"
 description: "Learn how to deploy your JinPress site"
 ---
@@ -366,14 +340,9 @@ JinPress generates static HTML files that can be deployed to any static hosting 
 Upload the contents of the `dist/` directory to your web server.
 
 Make sure to configure your server to serve `index.html` files for directory requests.
-"""
-        
-        deployment_path = project_dir / "docs" / "guide" / "deployment.md"
-        with open(deployment_path, 'w', encoding='utf-8') as f:
-            f.write(deployment_content)
-        
-        # Create about.md
-        about_content = """---
+''',
+            
+            'about.md': '''---
 title: "About"
 description: "About this JinPress site"
 ---
@@ -400,55 +369,85 @@ JinPress is a fast, lightweight, and elegantly configured Python static site gen
 - Check the [documentation](/guide/)
 - Visit the [GitHub repository](https://github.com/jinpress/jinpress)
 - Join our community discussions
-"""
+'''
+        }
+
+
+class Scaffold:
+    """Project scaffolding for JinPress."""
+    
+    def __init__(self):
+        """Initialize scaffolder."""
+        pass
+    
+    def create_project(self, project_name: str, target_dir: Optional[Path] = None) -> Path:
+        """
+        Create a new JinPress project.
         
-        about_path = project_dir / "docs" / "about.md"
-        with open(about_path, 'w', encoding='utf-8') as f:
-            f.write(about_content)
+        Args:
+            project_name: Name of the project
+            target_dir: Target directory (defaults to current directory)
+            
+        Returns:
+            Path to the created project directory
+        """
+        if target_dir is None:
+            target_dir = Path.cwd()
+        
+        project_dir = target_dir / project_name
+        
+        # Check if directory already exists
+        if project_dir.exists():
+            raise ScaffoldError(f"Directory already exists: {project_dir}")
+        
+        # Create project structure
+        self._create_directory_structure(project_dir)
+        
+        # Create configuration file
+        self._create_config_file(project_dir, project_name)
+        
+        # Create sample content
+        self._create_sample_content(project_dir)
+        
+        # Create gitignore
+        self._create_gitignore(project_dir)
+        
+        return project_dir
+    
+    def _create_directory_structure(self, project_dir: Path) -> None:
+        """Create the basic directory structure."""
+        directories = [
+            project_dir,
+            project_dir / "docs",
+            project_dir / "docs" / "guide",
+            project_dir / "static",
+            project_dir / ".jinpress",
+            project_dir / ".jinpress" / "cache",
+        ]
+        
+        for directory in directories:
+            directory.mkdir(parents=True, exist_ok=True)
+    
+    def _create_config_file(self, project_dir: Path, project_name: str) -> None:
+        """Create the configuration file."""
+        config_content = ScaffoldTemplates.get_config_template(project_name)
+        config_path = project_dir / "config.yml"
+        with open(config_path, 'w', encoding='utf-8') as f:
+            f.write(config_content)
+    
+    def _create_sample_content(self, project_dir: Path) -> None:
+        """Create sample markdown content."""
+        content_templates = ScaffoldTemplates.get_content_templates()
+        
+        for file_path, content in content_templates.items():
+            full_path = project_dir / "docs" / file_path
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(content)
     
     def _create_gitignore(self, project_dir: Path) -> None:
         """Create .gitignore file."""
-        gitignore_content = """# JinPress
-dist/
-.jinpress/cache/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-env/
-ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-"""
-        
+        gitignore_content = ScaffoldTemplates.get_gitignore_template()
         gitignore_path = project_dir / ".gitignore"
         with open(gitignore_path, 'w', encoding='utf-8') as f:
             f.write(gitignore_content)

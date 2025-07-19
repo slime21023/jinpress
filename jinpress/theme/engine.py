@@ -6,7 +6,7 @@ Handles template loading, rendering, and theme customization.
 
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Optional
+from typing import Any, Dict, List, Optional
 
 import minijinja
 from minijinja import Environment
@@ -33,40 +33,46 @@ class ThemeEngine:
         self.env = self._setup_environment()
     
     def _setup_environment(self) -> Environment:
-        """Set up Jinja2 environment with proper template loading."""
-        # Template search paths (in order of priority)
-        template_paths = []
-        
-        # 1. User custom templates (highest priority)
-        user_templates = self.project_root / "templates"
-        if user_templates.exists():
-            template_paths.append(str(user_templates))
-        
-        # 2. Default theme templates
-        default_theme_path = Path(__file__).parent / "default" / "templates"
-        if default_theme_path.exists():
-            template_paths.append(str(default_theme_path))
+        """Set up minijinja environment with proper template loading."""
+        template_paths = self._get_template_paths()
         
         if not template_paths:
             raise ThemeError("No template directories found")
 
-        def custom_loader(name: str) -> Optional[str]:
-            for template_path in template_paths:
-                path = Path(template_path) / name
-                if path.is_file():
-                    with open(path, "r", encoding="utf-8") as f:
-                        return f.read()
-            return None
-
-        env = Environment(loader=custom_loader)
-        
-        # Add custom filters and functions
+        env = Environment(loader=self._create_template_loader(template_paths))
         self._add_custom_filters(env)
         
         return env
     
+    def _get_template_paths(self) -> List[str]:
+        """Get template search paths - user templates OR default templates (exclusive mode)."""
+        # 1. Check for user custom templates first
+        user_templates = self.project_root / "templates"
+        if user_templates.exists() and user_templates.is_dir():
+            return [str(user_templates)]
+        
+        # 2. Fall back to default theme templates
+        default_theme_path = Path(__file__).parent / "default" / "templates"
+        if default_theme_path.exists() and default_theme_path.is_dir():
+            return [str(default_theme_path)]
+        
+        # 3. No valid template directory found
+        return []
+    
+    def _create_template_loader(self, template_paths: List[str]):
+        """Create a template loader function for the given paths."""
+        def template_loader(name: str) -> Optional[str]:
+            """Load template from the first available path."""
+            for template_path in template_paths:
+                template_file = Path(template_path) / name
+                if template_file.is_file():
+                    return template_file.read_text(encoding="utf-8")
+            return None
+        
+        return template_loader
+    
     def _add_custom_filters(self, env: Environment) -> None:
-        """Add custom Jinja2 filters and functions."""
+        """Add custom minijinja filters and functions."""
         
         def url_for(path: str, base: str = "/") -> str:
             """Generate URL for a given path."""

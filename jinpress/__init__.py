@@ -6,8 +6,8 @@ beautiful documentation sites with minimal configuration.
 """
 
 __version__ = "1.0.0"
-__author__ = "JinPress Team"
-__email__ = "team@jinpress.dev"
+__author__ = "KevinChueh"
+__email__ = "slime21023@gmail.com"
 __license__ = "MIT"
 
 from .builder import Builder

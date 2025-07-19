@@ -46,7 +46,6 @@ class TestScaffold(unittest.TestCase):
             "docs",
             "docs/guide",
             "static",
-            "templates",
             ".jinpress",
             ".jinpress/cache",
         ]

@@ -77,12 +77,29 @@ class Config:
             }
         }
         
-        # Deep merge
-        result = defaults.copy()
-        for key, value in config.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                result[key] = {**result[key], **value}
+        return self._deep_merge(defaults, config)
+    
+    def _deep_merge(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Recursively merge two dictionaries.
+        
+        Args:
+            base: Base dictionary (defaults)
+            override: Override dictionary (user config)
+            
+        Returns:
+            Merged dictionary
+        """
+        result = base.copy()
+        
+        for key, value in override.items():
+            if (key in result and 
+                isinstance(result[key], dict) and 
+                isinstance(value, dict)):
+                # Recursively merge nested dictionaries
+                result[key] = self._deep_merge(result[key], value)
             else:
+                # Direct assignment for non-dict values or new keys
                 result[key] = value
         
         return result
