@@ -48,10 +48,10 @@ dev = [
 jinpress = "jinpress.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/jinpress/jinpress"
-Documentation = "https://jinpress.github.io"
-Repository = "https://github.com/jinpress/jinpress"
-Issues = "https://github.com/jinpress/jinpress/issues"
+Homepage = "https://github.com/slime21023/jinpress"
+Documentation = "https://github.com/slime21023/jinpress/tree/main/document"
+Repository = "https://github.com/slime21023/jinpress"
+Issues = "https://github.com/slime21023/jinpress/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["jinpress"]

@@ -136,7 +136,7 @@ This is a warning container.
 
 ## Requirements
 
-- Python 3.8
+- Python 3.8+
 
 ## License
 
