@@ -142,14 +142,22 @@ class ThemeEngine:
     
     def get_static_files(self) -> List[Path]:
         """
-        Get list of static files from the theme.
+        Get list of static files from the theme (exclusive mode).
         
         Returns:
             List of static file paths
         """
         static_files = []
         
-        # Default theme static files
+        # 1. Check for user custom theme static files first
+        user_static = self.project_root / "templates" / "static"
+        if user_static.exists() and user_static.is_dir():
+            for file_path in user_static.rglob("*"):
+                if file_path.is_file():
+                    static_files.append(file_path)
+            return static_files
+        
+        # 2. Fall back to default theme static files
         default_static = Path(__file__).parent / "default" / "static"
         if default_static.exists():
             for file_path in default_static.rglob("*"):
@@ -160,7 +168,7 @@ class ThemeEngine:
     
     def copy_static_files(self, output_dir: Path) -> None:
         """
-        Copy theme static files to output directory.
+        Copy theme static files to output directory (exclusive mode).
         
         Args:
             output_dir: Output directory for built site
@@ -168,7 +176,17 @@ class ThemeEngine:
         import shutil
         
         static_files = self.get_static_files()
-        theme_static_dir = Path(__file__).parent / "default" / "static"
+        if not static_files:
+            return
+        
+        # Determine the source static directory
+        user_static = self.project_root / "templates" / "static"
+        if user_static.exists() and user_static.is_dir():
+            # Using user custom theme static files
+            theme_static_dir = user_static
+        else:
+            # Using default theme static files
+            theme_static_dir = Path(__file__).parent / "default" / "static"
         
         for file_path in static_files:
             # Calculate relative path from theme static directory
