@@ -1,6 +1,7 @@
 # JinPress
 
-A fast, lightweight, and elegantly configured Python static site generator inspired by VitePress.
+A fast, lightweight, and elegantly configured Python static site generator
+inspired by VitePress.
 
 ## Features
 
@@ -87,7 +88,7 @@ themeConfig:
       link: "/guide/"
     - text: "About"
       link: "/about/"
-  
+
   sidebar:
     "/guide/":
       - text: "Getting Started"
@@ -96,19 +97,19 @@ themeConfig:
         link: "/guide/configuration/"
       - text: "Deployment"
         link: "/guide/deployment/"
-  
+
   socialLinks:
     - icon: "github"
       link: "https://github.com/user/repo"
-  
+
   editLink:
     pattern: "https://github.com/user/repo/edit/main/docs/:path"
     text: "Edit this page"
-  
+
   footer:
     message: "Built with JinPress"
     copyright: "Copyright © 2025"
-  
+
   lastUpdated: true
 ```
 
@@ -125,13 +126,9 @@ JinPress supports enhanced markdown with:
 Example:
 
 ```markdown
-:::tip
-This is a tip container with custom styling.
-:::
+:::tip This is a tip container with custom styling. :::
 
-:::warning
-This is a warning container.
-:::
+:::warning This is a warning container. :::
 ```
 
 ## Requirements

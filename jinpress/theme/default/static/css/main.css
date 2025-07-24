@@ -125,8 +125,7 @@ body {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
+  width: 100%;
   padding: 0 var(--spacing-l);
 }
 
@@ -144,9 +143,11 @@ body {
 
 /* Search Box */
 .navbar-search {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   max-width: 320px;
-  margin: 0 var(--spacing-l);
+  width: 100%;
 }
 
 .search-box {
@@ -188,6 +189,13 @@ body {
   display: none;
   z-index: 999;
   box-shadow: var(--shadow-8);
+}
+
+/* Right Side Navigation Group */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-l);
 }
 
 /* Navigation Links */
