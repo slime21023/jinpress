@@ -76,5 +76,10 @@ ignore = []
 quote-style = "double"
 indent-style = "space"
 
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+]
+
 [tool.ruff.lint.isort]
 known-first-party = ["jinpress"]
