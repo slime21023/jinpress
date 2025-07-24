@@ -463,27 +463,74 @@ body {
   font-family: var(--font-family-mono);
   font-size: 13px;
   background: var(--color-neutral-background-2);
-  padding: var(--spacing-xs) var(--spacing-s);
+  padding: 2px 6px;
   border-radius: var(--border-radius-s);
   color: var(--color-neutral-foreground-1);
+  border: 1px solid var(--color-neutral-stroke-1);
 }
 
 .page-content pre {
-  margin: var(--spacing-l) 0;
-  padding: var(--spacing-l);
-  background: var(--color-neutral-background-2);
-  border-radius: var(--border-radius-m);
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-xl);
+  background: #0d1117;
+  border-radius: var(--border-radius-l);
   overflow-x: auto;
   font-family: var(--font-family-mono);
-  font-size: 13px;
-  line-height: 1.4;
-  border: 1px solid var(--color-neutral-stroke-1);
+  font-size: 14px;
+  line-height: 1.6;
+  border: 1px solid #30363d;
+  box-shadow: var(--shadow-4);
+  position: relative;
 }
 
 .page-content pre code {
   background: none;
   padding: 0;
   border-radius: 0;
+  border: none;
+  color: #e6edf3;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Code block with line numbers */
+.page-content pre[data-line-numbers] {
+  padding-left: 3.5em;
+}
+
+.page-content pre[data-line-numbers]::before {
+  content: counter(line-number);
+  counter-increment: line-number;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3em;
+  background: rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  color: #858585;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: right;
+  padding: var(--spacing-xl) var(--spacing-s) var(--spacing-xl) 0;
+}
+
+/* Light theme adjustments - Keep code blocks dark for better syntax highlighting */
+@media (prefers-color-scheme: light) {
+  .page-content pre {
+    background: #1e1e1e;
+    border: 1px solid #404040;
+  }
+  
+  .page-content pre code {
+    color: #d4d4d4;
+  }
+  
+  .page-content pre[data-line-numbers]::before {
+    background: rgba(255, 255, 255, 0.05);
+    border-right-color: rgba(255, 255, 255, 0.1);
+    color: #858585;
+  }
 }
 
 /* Custom Containers */
