@@ -1,0 +1,25 @@
+{% if theme.footer and (theme.footer.message or theme.footer.copyright) %}
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-content">
+            {% if theme.footer.message %}
+            <p class="footer-message">{{ theme.footer.message }}</p>
+            {% endif %}
+            
+            {% if theme.footer.links %}
+            <nav class="footer-links" aria-label="Footer navigation">
+                {% for link in theme.footer.links %}
+                <a href="{{ link.link | url_for(site.base) }}" class="footer-link">
+                    {{ link.text }}
+                </a>
+                {% endfor %}
+            </nav>
+            {% endif %}
+        </div>
+        
+        {% if theme.footer.copyright %}
+        <p class="footer-copyright">{{ theme.footer.copyright }}</p>
+        {% endif %}
+    </div>
+</footer>
+{% endif %}

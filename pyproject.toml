@@ -42,6 +42,7 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "ruff>=0.1.0",
+    "hypothesis>=6.0.0",
 ]
 
 [project.scripts]
@@ -70,7 +71,12 @@ select = [
     "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
 ]
-ignore = []
+ignore = [
+    "E501",  # line too long - handled by formatter for code, but not for string templates
+]
+
+[tool.ruff.lint.per-file-ignores]
+"jinpress/scaffold.py" = ["W291", "W293", "E501"]  # Allow whitespace in string templates
 
 [tool.ruff.format]
 quote-style = "double"

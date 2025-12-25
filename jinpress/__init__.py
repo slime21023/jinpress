@@ -20,12 +20,12 @@ from .theme.engine import ThemeEngine
 
 __all__ = [
     "Builder",
-    "Config", 
+    "Config",
     "Renderer",
     "Scaffold",
     "SearchIndexer",
     "DevServer",
     "serve_site",
     "ThemeEngine",
-    "__version__"
+    "__version__",
 ]

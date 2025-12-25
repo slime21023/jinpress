@@ -1,0 +1,37 @@
+<nav class="toc-nav" aria-label="Table of contents">
+    <div class="toc-header">
+        <h4 class="toc-title">On this page</h4>
+    </div>
+    
+    <ul class="toc-list">
+        {% for item in page.toc %}
+        <li class="toc-item toc-level-{{ item.level }}">
+            <a href="#{{ item.anchor }}" class="toc-link">
+                {{ item.text }}
+            </a>
+            {% if item.children and item.children | length > 0 %}
+            <ul class="toc-sublist">
+                {% for child in item.children %}
+                <li class="toc-item toc-level-{{ child.level }}">
+                    <a href="#{{ child.anchor }}" class="toc-link">
+                        {{ child.text }}
+                    </a>
+                    {% if child.children and child.children | length > 0 %}
+                    <ul class="toc-sublist">
+                        {% for grandchild in child.children %}
+                        <li class="toc-item toc-level-{{ grandchild.level }}">
+                            <a href="#{{ grandchild.anchor }}" class="toc-link">
+                                {{ grandchild.text }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</nav>

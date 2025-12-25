@@ -1,0 +1,38 @@
+﻿:root {
+  /* Furo Light Mode Colors */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8f9fb;
+  --color-foreground-primary: #2e3440; /* Dark Grey Text */
+  --color-foreground-secondary: #5c6166; /* Muted Text */
+  --color-foreground-muted: #848a90;
+  
+  --color-brand-primary: #2980b9; /* Furo Blue */
+  --color-brand-content: #2980b9;
+  
+  --color-border: #eee;
+  --color-admonition-bg: #f8f9fa;
+  
+  /* Typography - Furo uses system fonts stack */
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-stack-monospace: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  
+  /* Layout Dimensions */
+  --sidebar-width: 16rem;
+  --toc-width: 14rem;
+  --content-max-width: 60rem;
+  --header-height: 3.5rem;
+}
+
+/* Furo Dark Mode Colors */
+[data-theme="dark"] {
+  --color-background-primary: #1e2124; /* Furo's signature dark bg */
+  --color-background-secondary: #17191c;
+  --color-foreground-primary: #dcdcdc;
+  --color-foreground-secondary: #a0a0a0;
+  
+  --color-brand-primary: #58a6ff; /* Lighter blue for dark mode */
+  --color-brand-content: #58a6ff;
+  
+  --color-border: #303030;
+  --color-admonition-bg: #25282d;
+}

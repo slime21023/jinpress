@@ -5,69 +5,136 @@ Creates new JinPress projects with sample content and configuration.
 """
 
 from pathlib import Path
-from typing import Dict, Optional
 
 
 class ScaffoldError(Exception):
     """Raised when there's an error during scaffolding."""
+
     pass
 
 
 class ScaffoldTemplates:
     """Static templates and content for scaffolding."""
-    
+
     @staticmethod
     def get_config_template(project_name: str) -> str:
-        """Get configuration file template."""
-        title = project_name.replace('-', ' ').replace('_', ' ').title()
-        return f'''site:
+        """Get configuration file template (jinpress.yml format)."""
+        title = project_name.replace("-", " ").replace("_", " ").title()
+        return f'''# JinPress Configuration
+# See https://jinpress.dev/guide/configuration/ for more options
+
+site:
   title: "{title}"
   description: "A JinPress documentation site"
-  lang: "en-US"
+  lang: "zh-TW"
   base: "/"
 
-themeConfig:
+theme:
   nav:
-    - text: "Home"
+    - text: "首頁"
       link: "/"
-    - text: "Guide"
+    - text: "指南"
       link: "/guide/"
-    - text: "About"
+    - text: "關於"
       link: "/about/"
   
   sidebar:
     "/guide/":
-      - text: "Getting Started"
+      - text: "快速開始"
         link: "/guide/getting-started/"
-      - text: "Configuration"
+      - text: "配置"
         link: "/guide/configuration/"
-      - text: "Deployment"
+      - text: "部署"
         link: "/guide/deployment/"
     "/":
-      - text: "Home"
+      - text: "首頁"
         link: "/"
-      - text: "About"
+      - text: "關於"
         link: "/about/"
-  
-  socialLinks:
-    - icon: "github"
-      link: "https://github.com/user/repo"
-  
-  editLink:
-    pattern: "https://github.com/user/repo/edit/main/docs/:path"
-    text: "Edit this page"
   
   footer:
     message: "Built with JinPress"
     copyright: "Copyright © 2025"
   
-  lastUpdated: true
+  edit_link:
+    pattern: "https://github.com/user/repo/edit/main/docs/:path"
+    text: "編輯此頁"
+  
+  last_updated: true
 '''
+
+    @staticmethod
+    def get_github_actions_template(project_name: str) -> str:
+        """Get GitHub Actions workflow template for deploying to GitHub Pages."""
+        return """# GitHub Actions workflow for deploying JinPress site to GitHub Pages
+name: Deploy JinPress Site
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jinpress
+      
+      - name: Build site
+        run: jinpress build
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+"""
 
     @staticmethod
     def get_gitignore_template() -> str:
         """Get .gitignore file template."""
-        return '''# JinPress
+        return """# JinPress
 dist/
 .jinpress/cache/
 
@@ -106,13 +173,13 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
-'''
+"""
 
     @staticmethod
-    def get_content_templates() -> Dict[str, str]:
+    def get_content_templates() -> dict[str, str]:
         """Get all markdown content templates."""
         return {
-            'index.md': '''---
+            "index.md": """---
 title: "Welcome to JinPress"
 description: "A fast, lightweight, and elegantly configured Python static site generator"
 ---
@@ -152,9 +219,8 @@ This is a tip container. You can use different types like `warning`, `danger`, a
 - Read the [Getting Started Guide](/guide/getting-started/)
 - Learn about [Configuration](/guide/configuration/)
 - Explore [Deployment Options](/guide/deployment/)
-''',
-            
-            'guide/index.md': '''---
+""",
+            "guide/index.md": """---
 title: "Guide"
 description: "JinPress documentation guide"
 ---
@@ -184,9 +250,8 @@ Ready to deploy your site? Check out our [Deployment](/guide/deployment/) guide 
 ---
 
 Choose a topic from the sidebar to dive deeper into JinPress documentation.
-''',
-            
-            'guide/getting-started.md': '''---
+""",
+            "guide/getting-started.md": """---
 title: "Getting Started"
 description: "Learn how to get started with JinPress"
 ---
@@ -252,9 +317,8 @@ The built site will be in the `dist/` directory.
 
 - Learn about [Configuration](/guide/configuration/)
 - Explore [Deployment Options](/guide/deployment/)
-''',
-            
-            'guide/configuration.md': '''---
+""",
+            "guide/configuration.md": """---
 title: "Configuration"
 description: "Learn how to configure your JinPress site"
 ---
@@ -328,9 +392,8 @@ themeConfig:
     message: "Built with JinPress"
     copyright: "Copyright © 2025"
 ```
-''',
-            
-            'guide/deployment.md': '''---
+""",
+            "guide/deployment.md": """---
 title: "Deployment"
 description: "Learn how to deploy your JinPress site"
 ---
@@ -377,9 +440,8 @@ JinPress generates static HTML files that can be deployed to any static hosting 
 Upload the contents of the `dist/` directory to your web server.
 
 Make sure to configure your server to serve `index.html` files for directory requests.
-''',
-            
-            'about.md': '''---
+""",
+            "about.md": """---
 title: "About"
 description: "About this JinPress site"
 ---
@@ -406,51 +468,54 @@ JinPress is a fast, lightweight, and elegantly configured Python static site gen
 - Check the [documentation](/guide/)
 - Visit the [GitHub repository](https://github.com/jinpress/jinpress)
 - Join our community discussions
-'''
+""",
         }
 
 
 class Scaffold:
     """Project scaffolding for JinPress."""
-    
+
     def __init__(self):
         """Initialize scaffolder."""
         pass
-    
-    def create_project(self, project_name: str, target_dir: Optional[Path] = None) -> Path:
+
+    def create_project(self, project_name: str, target_dir: Path | None = None) -> Path:
         """
         Create a new JinPress project.
-        
+
         Args:
             project_name: Name of the project
             target_dir: Target directory (defaults to current directory)
-            
+
         Returns:
             Path to the created project directory
         """
         if target_dir is None:
             target_dir = Path.cwd()
-        
+
         project_dir = target_dir / project_name
-        
+
         # Check if directory already exists
         if project_dir.exists():
             raise ScaffoldError(f"Directory already exists: {project_dir}")
-        
+
         # Create project structure
         self._create_directory_structure(project_dir)
-        
+
         # Create configuration file
         self._create_config_file(project_dir, project_name)
-        
+
         # Create sample content
         self._create_sample_content(project_dir)
-        
+
         # Create gitignore
         self._create_gitignore(project_dir)
-        
+
+        # Create GitHub Actions workflow
+        self._create_github_actions_workflow(project_dir, project_name)
+
         return project_dir
-    
+
     def _create_directory_structure(self, project_dir: Path) -> None:
         """Create the basic directory structure."""
         directories = [
@@ -461,30 +526,42 @@ class Scaffold:
             project_dir / ".jinpress",
             project_dir / ".jinpress" / "cache",
         ]
-        
+
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
-    
+
     def _create_config_file(self, project_dir: Path, project_name: str) -> None:
-        """Create the configuration file."""
+        """Create the configuration file (jinpress.yml)."""
         config_content = ScaffoldTemplates.get_config_template(project_name)
-        config_path = project_dir / "config.yml"
-        with open(config_path, 'w', encoding='utf-8') as f:
+        config_path = project_dir / "jinpress.yml"
+        with open(config_path, "w", encoding="utf-8") as f:
             f.write(config_content)
-    
+
     def _create_sample_content(self, project_dir: Path) -> None:
         """Create sample markdown content."""
         content_templates = ScaffoldTemplates.get_content_templates()
-        
+
         for file_path, content in content_templates.items():
             full_path = project_dir / "docs" / file_path
             full_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(full_path, 'w', encoding='utf-8') as f:
+            with open(full_path, "w", encoding="utf-8") as f:
                 f.write(content)
-    
+
     def _create_gitignore(self, project_dir: Path) -> None:
         """Create .gitignore file."""
         gitignore_content = ScaffoldTemplates.get_gitignore_template()
         gitignore_path = project_dir / ".gitignore"
-        with open(gitignore_path, 'w', encoding='utf-8') as f:
+        with open(gitignore_path, "w", encoding="utf-8") as f:
             f.write(gitignore_content)
+
+    def _create_github_actions_workflow(
+        self, project_dir: Path, project_name: str
+    ) -> None:
+        """Create GitHub Actions workflow for deploying to GitHub Pages."""
+        workflows_dir = project_dir / ".github" / "workflows"
+        workflows_dir.mkdir(parents=True, exist_ok=True)
+
+        workflow_content = ScaffoldTemplates.get_github_actions_template(project_name)
+        workflow_path = workflows_dir / "deploy.yml"
+        with open(workflow_path, "w", encoding="utf-8") as f:
+            f.write(workflow_content)

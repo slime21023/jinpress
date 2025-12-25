@@ -1,0 +1,47 @@
+﻿<div class="sidebar-brand">
+    <a href="{{ '/' | url_for(site.base) }}" style="font-weight:bold; font-size:1.2rem; color:var(--color-foreground-primary); text-decoration:none;">
+        {{ site.title }}
+    </a>
+</div>
+
+<div class="sidebar-search" style="margin: 1rem 0;">
+    <input type="text" id="search-input" placeholder="Search docs..." 
+           style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:4px; background:var(--color-background-primary); color:var(--color-foreground-primary);">
+</div>
+
+<nav class="sidebar-nav">
+    <ul style="list-style:none; padding:0;">
+        {% for item in sidebar %}
+        <li style="margin-bottom: 0.5rem;">
+            {% if item.link %}
+            <a href="{{ item.link | url_for(site.base) }}" 
+               class="sidebar-link{% if page.url == item.link %} active{% endif %}"
+               style="color: var(--color-foreground-secondary); display:block; padding:0.2rem 0;">
+                {{ item.text }}
+            </a>
+            {% else %}
+            <div class="sidebar-group-title" style="font-weight:bold; margin-top:1rem; margin-bottom:0.5rem;">{{ item.text }}</div>
+            {% if item.items %}
+            <ul style="list-style:none; padding-left:1rem;">
+                {% for subitem in item.items %}
+                <li>
+                    <a href="{{ subitem.link | url_for(site.base) }}" 
+                       class="sidebar-link{% if page.url == subitem.link %} active{% endif %}"
+                       style="color: var(--color-foreground-secondary); display:block; padding:0.2rem 0;">
+                        {{ subitem.text }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
+
+<div class="theme-toggle-container" style="margin-top: 2rem;">
+    <button id="theme-toggle-btn" style="background:none; border:1px solid var(--color-border); padding:0.5rem; cursor:pointer; color:var(--color-foreground-primary); border-radius:4px;">
+        Toggle Theme
+    </button>
+</div>

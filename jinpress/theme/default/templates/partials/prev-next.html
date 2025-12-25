@@ -1,0 +1,33 @@
+{% if page.prev or page.next %}
+<nav class="prev-next-nav" aria-label="Page navigation">
+    <div class="prev-next-container">
+        {% if page.prev %}
+        <a href="{{ page.prev.link | url_for(site.base) }}" class="prev-next-link prev-link">
+            <span class="prev-next-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Previous
+            </span>
+            <span class="prev-next-title">{{ page.prev.text }}</span>
+        </a>
+        {% else %}
+        <div class="prev-next-placeholder"></div>
+        {% endif %}
+        
+        {% if page.next %}
+        <a href="{{ page.next.link | url_for(site.base) }}" class="prev-next-link next-link">
+            <span class="prev-next-label">
+                Next
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </span>
+            <span class="prev-next-title">{{ page.next.text }}</span>
+        </a>
+        {% else %}
+        <div class="prev-next-placeholder"></div>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}

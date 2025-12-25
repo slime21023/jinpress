@@ -1,16 +1,58 @@
 {% extends "base.html" %}
 
+{% block body_class %}page-layout{% endblock %}
+
 {% block content %}
-<div class="page">
-    <div class="page-header">
-        <h1 class="page-title">{{ title }}</h1>
-        {% if description %}
-        <p class="page-description">{{ description }}</p>
+<article class="page">
+    <header class="page-header">
+        {% if page.frontmatter and page.frontmatter.badge %}
+        <span class="page-badge">{{ page.frontmatter.badge }}</span>
         {% endif %}
-    </div>
+        
+        <h1 class="page-title">{{ page.title }}</h1>
+        
+        {% if page.description %}
+        <p class="page-description">{{ page.description }}</p>
+        {% endif %}
+        
+        {% if page.frontmatter and (page.frontmatter.author or page.frontmatter.date) %}
+        <div class="page-meta">
+            {% if page.frontmatter.author %}
+            <span class="page-author">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {{ page.frontmatter.author }}
+            </span>
+            {% endif %}
+            {% if page.frontmatter.date %}
+            <span class="page-date">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                {{ page.frontmatter.date }}
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </header>
     
     <div class="page-content">
-        {{ content | safe }}
+        {{ page.content | safe }}
     </div>
-</div>
+    
+    {% if page.frontmatter and page.frontmatter.tags %}
+    <footer class="page-footer">
+        <div class="page-tags">
+            {% for tag in page.frontmatter.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+    </footer>
+    {% endif %}
+</article>
 {% endblock %}

@@ -6,3 +6,4 @@ jinpress/theme/__pycache_
 dist
 .vscode
 test-*
+.*_cache
